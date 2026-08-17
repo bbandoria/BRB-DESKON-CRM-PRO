@@ -1,0 +1,11 @@
+Este arquivo existe só pra este teste ler: tests/unit/cron-routes-scheduled.test.ts
+
+`vercel.json` está com `"crons": []` DE PROPÓSITO — não é um esquecimento.
+
+Motivo: o projeto na Vercel está no plano Hobby, que só permite cron 1x/dia (a
+maioria das rotas em app/api/v1/cron precisa rodar a cada minuto pra fazer
+sentido). Enquanto isso, as rotas são disparadas manualmente durante teste.
+
+Pra reativar de verdade: fazer upgrade do projeto Vercel pra Pro, restaurar a
+lista completa de crons em vercel.json (a partir de docker/scheduler/entrypoint.sh,
+que é a fonte da verdade) e apagar este arquivo.

@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { describe, expect, it } from "vitest";
@@ -34,6 +34,11 @@ const CRONTAB = join(RAIZ, "docker", "scheduler", "entrypoint.sh");
 // `scheduler`, então o agendamento vive em vercel.json. Mesma cerca mecânica,
 // mesmo defeito possível: rota nova sem linha aqui nunca dispara sozinha lá.
 const VERCEL_JSON = join(RAIZ, "vercel.json");
+// Presença = "crons: []" é deliberado (plano Hobby, temporário), não esquecimento.
+// Ver o próprio arquivo pra motivo e como reverter.
+const VERCEL_CRONS_DESLIGADOS_DE_PROPOSITO = existsSync(
+  join(RAIZ, ".vercel-crons-disabled-hobby"),
+);
 
 /** As rotas que existem, lidas do disco — não de uma lista mantida à mão. */
 function rotasNoCodigo(): string[] {
@@ -88,6 +93,13 @@ describe("rotas de cron × agendamento no self-host", () => {
   });
 
   it("toda rota de cron do código está agendada no vercel.json (destino B)", () => {
+    if (VERCEL_CRONS_DESLIGADOS_DE_PROPOSITO) {
+      // Marcador presente (ver .vercel-crons-disabled-hobby): plano Hobby não
+      // aceita cron sub-diário, então o array fica vazio até o upgrade pra Pro.
+      // Sem o marcador, este `if` não existe e o teste volta a cobrar de verdade.
+      expect(rotasAgendadasNaVercel()).toEqual([]);
+      return;
+    }
     const naoAgendadas = rotasNoCodigo().filter((r) => !rotasAgendadasNaVercel().includes(r));
     expect(
       naoAgendadas,
