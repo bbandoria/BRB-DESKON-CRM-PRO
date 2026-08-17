@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
   "functions": {
     "app/api/v1/cron/**/route.ts": {
       "maxDuration": 120
