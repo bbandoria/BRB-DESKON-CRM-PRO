@@ -9,8 +9,12 @@ import type { NextConfig } from "next";
  */
 const nextConfig: NextConfig = {
   // Self-host (HostGator): gera .next/standalone pro container Docker (node server.js).
-  // Aditivo — não afeta o deploy Vercel.
-  output: "standalone",
+  // NA VERCEL, DESLIGA: medido (deploy 2026-08-17) que "standalone" quebra o build dela —
+  // ela tem o próprio empacotamento serverless e não gera o next-server.js.nft.json que
+  // esse modo pressupõe, e o build falha com ENOENT nesse arquivo já no passo final,
+  // depois de compilar e gerar as páginas com sucesso. `VERCEL` é setada pela própria
+  // Vercel em todo build dela — não existe no build da imagem Docker do self-host.
+  output: process.env.VERCEL ? undefined : "standalone",
   reactStrictMode: true,
   poweredByHeader: false,
   // typedRoutes moved out of experimental in Next 15.5+
